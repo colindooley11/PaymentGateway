@@ -1,6 +1,6 @@
 ﻿namespace PaymentGateway.Api.Models
 {
-    public class AcquiringBankResponse
+    public class PaymentGatewayResponse
     {
         public string Status { get; set; }
     }
