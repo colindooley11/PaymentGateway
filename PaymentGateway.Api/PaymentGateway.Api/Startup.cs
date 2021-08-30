@@ -1,5 +1,8 @@
 namespace PaymentGateway.Api
 {
+    using System.Net.Http;
+    using System.Net.Http.Json;
+    using System.Threading.Tasks;
     using Builders;
     using Commands;
     using FluentValidation.AspNetCore;
@@ -11,6 +14,8 @@ namespace PaymentGateway.Api
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Hosting;
     using Microsoft.OpenApi.Models;
+    using Models;
+    using Models.Web;
 
     public class Startup
     {
@@ -31,17 +36,20 @@ namespace PaymentGateway.Api
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "PaymentGateway.Api", Version = "v1" });
             });
 
-            this.BuildCosmosFactory(services,Configuration["CosmosAuthEndpoint"], Configuration["CosmosAuthKey"], "CardPayments");
-            services.AddSingleton<IAcquiringBankGateway>(new AcquiringBankGatewayNoOp("authenticationKey"));
-            services.AddSingleton<ISaveCardPaymentCommand,SaveCardPaymentCommand>();
+            this.BuildCosmosFactory(services, Configuration["CosmosAuthEndpoint"], Configuration["CosmosAuthKey"],
+                "CardPayments");
+            services.AddSingleton<IAcquiringBankGateway, AcquiringBankGateway>();
+            services.AddSingleton<ISaveCardPaymentCommand, SaveCardPaymentCommand>();
             services.AddMvc().AddFluentValidation(configuration =>
                 configuration.RegisterValidatorsFromAssemblyContaining<Program>());
         }
 
-        protected virtual void BuildCosmosFactory(IServiceCollection services, string accountEndpoint, string authKeyOrResourceToken, string cardpaymentscontainer)
+        protected virtual void BuildCosmosFactory(IServiceCollection services, string accountEndpoint,
+            string authKeyOrResourceToken, string cardpaymentscontainer)
         {
             var cosmosBuilderFactory = new CosmosBuilderFactory();
-            var container = cosmosBuilderFactory.Build(accountEndpoint, authKeyOrResourceToken, cardpaymentscontainer, "PaymentGateway.Api");
+            var container = cosmosBuilderFactory.Build(accountEndpoint, authKeyOrResourceToken, cardpaymentscontainer,
+                "PaymentGateway.Api");
             services.AddSingleton(container);
         }
 
@@ -64,10 +72,23 @@ namespace PaymentGateway.Api
 
             app.UseAuthorization();
 
-            app.UseEndpoints(endpoints =>
-            {
-                endpoints.MapControllers();
-            });
+            app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
+        }
+    }
+
+    public class AcquiringBankGateway : IAcquiringBankGateway
+    {
+        private readonly IHttpClientFactory _clientFactory;
+
+        public AcquiringBankGateway(IHttpClientFactory clientFactory)
+        {
+            _clientFactory = clientFactory;
+        }
+
+        public async Task<AcquiringBankResponse> CapturePayment(CardPaymentRequest cardPaymentRequest)
+        {
+            var client = _clientFactory.CreateClient("AcquiringBankGateway");
+            return new AcquiringBankResponse();
         }
     }
 }

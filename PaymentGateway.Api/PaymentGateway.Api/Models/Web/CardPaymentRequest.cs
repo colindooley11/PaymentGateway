@@ -1,14 +1,9 @@
-﻿using System;
-
-namespace PaymentGateway.Api.Models
+namespace PaymentGateway.Api.Models.Web
 {
-    using Newtonsoft.Json;
+    using System;
 
-    public class CardPaymentData
+    public class CardPaymentRequest
     {
-
-        [JsonProperty(PropertyName = "id")]
-        public Guid Id { get; set; }
         public string CardNumber { get; set; }
 
         public int ExpiryMonth { get; set; }
@@ -21,7 +16,7 @@ namespace PaymentGateway.Api.Models
 
         public int CVV { get; set; }
 
-        public Guid PaymentReference { get; set; }
+        public Guid  PaymentReference { get; set; }
 
     }
 }

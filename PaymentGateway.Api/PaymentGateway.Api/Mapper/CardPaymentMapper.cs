@@ -1,25 +1,24 @@
 namespace PaymentGateway.Api.Mapper
 {
     using Models;
+    using Models.Data;
+    using Models.Web;
 
     public class CardPaymentMapper
     {
-        public static CardPaymentData ToCardPaymentData(CardPayment cardPayment)
+        public static CardPaymentData ToCardPaymentData(CardPaymentRequest cardPaymentRequest)
         {
             return new CardPaymentData
             {
-                PaymentReference = cardPayment.PaymentReference,
-                Id = cardPayment.PaymentReference,
-                Amount = cardPayment.Amount,
-                ExpiryMonth = cardPayment.ExpiryMonth,
-                ExpiryYear = cardPayment.ExpiryYear,
-                CVV = cardPayment.CVV,
-                CardNumber = cardPayment.CardNumber,
-                Currency = cardPayment.Currency
-
-
+                PaymentReference = cardPaymentRequest.PaymentReference,
+                Id = cardPaymentRequest.PaymentReference,
+                Amount = cardPaymentRequest.Amount,
+                ExpiryMonth = cardPaymentRequest.ExpiryMonth,
+                ExpiryYear = cardPaymentRequest.ExpiryYear,
+                CVV = cardPaymentRequest.CVV,
+                CardNumber = cardPaymentRequest.CardNumber,
+                Currency = cardPaymentRequest.Currency
             };
-
         }
     }
 }

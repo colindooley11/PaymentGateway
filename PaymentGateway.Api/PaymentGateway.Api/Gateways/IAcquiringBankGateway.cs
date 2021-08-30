@@ -2,9 +2,10 @@
 {
     using System.Threading.Tasks;
     using Models;
+    using Models.Web;
 
     public interface IAcquiringBankGateway
     {
-        Task<AcquiringBankResponse> CapturePayment(CardPayment cardPayment);
+        Task<AcquiringBankResponse> CapturePayment(CardPaymentRequest cardPaymentRequest);
     }
 }

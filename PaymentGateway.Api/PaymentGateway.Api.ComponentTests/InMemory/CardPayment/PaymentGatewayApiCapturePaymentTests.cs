@@ -4,6 +4,8 @@
     using System.Net.Http.Json;
     using System.Threading.Tasks;
     using Models;
+    using Models.Data;
+    using Models.Web;
     using Moq;
     using NUnit.Framework;
     using TestStack.BDDfy;

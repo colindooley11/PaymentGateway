@@ -2,6 +2,7 @@
 {
     using System.Threading.Tasks;
     using Models;
+    using Models.Web;
 
     public class AcquiringBankGatewayNoOp : IAcquiringBankGateway
     {
@@ -11,9 +12,9 @@
         {
             _authenticationKey = authenticationKey;
         }
-        public Task<AcquiringBankResponse> CapturePayment(CardPayment cardPayment)
+        public Task<AcquiringBankResponse> CapturePayment(CardPaymentRequest cardPaymentRequest)
         {
-            var status = cardPayment.CardNumber switch
+            var status = cardPaymentRequest.CardNumber switch
             {
                 "4444333322221111" => "Successful",
                 _ => "Declined"

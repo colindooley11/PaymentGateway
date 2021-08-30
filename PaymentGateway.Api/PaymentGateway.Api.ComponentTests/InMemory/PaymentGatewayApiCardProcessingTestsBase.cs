@@ -8,13 +8,14 @@ namespace PaymentGateway.Api.ComponentTests.InMemory
     using System.Text.Json;
     using System.Threading.Tasks;
     using Commands;
+    using Models.Web;
     using Moq;
     using NUnit.Framework;
 
     public class PaymentGatewayApiCardProcessingTestsBase
     {
         protected HttpResponseMessage _result;
-        protected Models.CardPayment _card;
+        protected CardPaymentRequest _card;
         protected HttpClient _gatewayClient;
         protected Mock<ISaveCardPaymentCommand> _cardPaymentCommand;
         private object _category;
@@ -46,12 +47,12 @@ namespace PaymentGateway.Api.ComponentTests.InMemory
 
         protected void Invalid_Card_Details()
         {
-            _card = new Models.CardPayment();
+            _card = new CardPaymentRequest();
         }
 
         protected void Valid_Card_Details()
         {
-            _card = new Models.CardPayment
+            _card = new CardPaymentRequest
             {
                 CardNumber = MagicCards.Success,
                 Amount = 10m,

@@ -2,8 +2,9 @@
 {
     using FluentValidation;
     using Models;
+    using Models.Web;
 
-    public class CardPaymentValidator : AbstractValidator<CardPayment>
+    public class CardPaymentValidator : AbstractValidator<CardPaymentRequest>
     {
         public CardPaymentValidator()
         {

@@ -7,6 +7,7 @@
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.Extensions.Logging;
     using Models;
+    using Models.Web;
 
     [ApiController]
     [Route("PaymentGateway/[controller]")]
@@ -25,12 +26,12 @@
 
         [HttpPost]
         [Route("ProcessPayment")]
-        public async Task<ActionResult> Post([FromBody] CardPayment cardPayment)
+        public async Task<ActionResult> Post([FromBody] CardPaymentRequest cardPaymentRequest)
         {
-            var bankResponse = await this._acquiringBankGateway.CapturePayment(cardPayment);
+            var bankResponse = await this._acquiringBankGateway.CapturePayment(cardPaymentRequest);
             if (bankResponse.Status == "Successful")
             {
-                await this._cardPaymentCommand.Execute(CardPaymentMapper.ToCardPaymentData(cardPayment));
+                await this._cardPaymentCommand.Execute(CardPaymentMapper.ToCardPaymentData(cardPaymentRequest));
                 return this.Created(string.Empty, new PaymentGatewayResponse { Status = "Successful" });
             }
             return this.Ok();

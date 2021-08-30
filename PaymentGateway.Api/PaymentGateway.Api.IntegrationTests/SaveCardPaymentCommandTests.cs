@@ -9,6 +9,7 @@ namespace PaymentGateway.Api.IntegrationTests
     using Commands;
     using Microsoft.Azure.Cosmos;
     using Models;
+    using Models.Data;
 
     public class Given_A_Card_Payment_When_Saving_Card_Payment
     {

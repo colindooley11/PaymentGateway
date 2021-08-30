@@ -4,6 +4,7 @@
     using System.Threading.Tasks;
     using InMemory;
     using Models;
+    using Models.Web;
     using NUnit.Framework;
     using TestStack.BDDfy;
 
