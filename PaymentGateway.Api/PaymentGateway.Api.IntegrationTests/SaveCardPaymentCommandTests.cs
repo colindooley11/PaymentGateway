@@ -5,45 +5,45 @@ namespace PaymentGateway.Api.IntegrationTests
     using System;
     using System.Linq;
     using System.Threading.Tasks;
-    using Microsoft.Azure.Documents;
-    using Microsoft.Azure.Documents.Client;
+    using Builders;
+    using Commands;
+    using Microsoft.Azure.Cosmos;
     using Models;
 
-    public class Given_A_Card_Payment
+    public class Given_A_Card_Payment_When_Saving_Card_Payment
     {
-        private DocumentClient _documentClient;
-        private ResourceResponse<DocumentCollection> _collection;
+        private Container _container;
+        private Guid _paymentReference;
 
         [SetUp]
-        public async Task When_Saving_Card_Payment()
+        public async Task SetUp()
         {
-            _documentClient = new DocumentClient(
-                new Uri("https://paymentgateway-cosmos-db.documents.azure.com:443/"),
-                "XfvKmJMieiWNmKNcWr9LTX8HU27qvjyuPbZN5f8XviPTrM5SI9bWHosAq3FEs8WR1Nhb4j4wqSwBdGxyKI5lZA==");
-            var db = await _documentClient.CreateDatabaseIfNotExistsAsync(new Database { Id = "CardPaymentIntTests" });
-            _collection = await _documentClient.CreateDocumentCollectionIfNotExistsAsync(db.Resource.SelfLink,
-                new DocumentCollection { Id = "CardPayments" });
-
-            var saveCardPaymentCommand = new SaveCardPaymentCommand(_collection.Resource.SelfLink, _documentClient);
-            var cardPayment = new CardPayment
+            _container = new CosmosBuilderFactory().Build("https://paymentgateway-cosmos-db.documents.azure.com:443/",
+                "XfvKmJMieiWNmKNcWr9LTX8HU27qvjyuPbZN5f8XviPTrM5SI9bWHosAq3FEs8WR1Nhb4j4wqSwBdGxyKI5lZA==",
+                "CardPaymentIntTests", "PaymentGateway.Api.IntegrationTests");
+            var saveCardPaymentCommand = new SaveCardPaymentCommand(_container);
+            _paymentReference = Guid.NewGuid();
+            var cardPaymentData = new CardPaymentData
             {
+                Id = _paymentReference,
+                PaymentReference = _paymentReference,
                 CardNumber = "4444333322221111",
                 Amount = 50,
                 CVV = 123,
                 Currency = "GBP",
                 ExpiryMonth = 1,
                 ExpiryYear = 22
-
             };
 
-            await saveCardPaymentCommand.Execute(cardPayment);
+            await saveCardPaymentCommand.Execute(cardPaymentData);
         }
 
         [Test]
         public void Then_The_Card_Payment_Details_Are_Saved()
         {
-            var query = this._documentClient.CreateDocumentQuery<CardPayment>(_collection.Resource.SelfLink)
-                .Where(payment => payment.CardNumber == "4444333322221111");
+            var query = this._container.GetItemLinqQueryable<CardPaymentData>(allowSynchronousQueryExecution:true)
+                .Where(payment => payment.PaymentReference.ToString() == _paymentReference.ToString());
+                       
             var card = query.ToList().First();
             Assert.AreEqual(card.CardNumber, "4444333322221111");
             Assert.AreEqual(card.Amount, 50);
@@ -56,7 +56,7 @@ namespace PaymentGateway.Api.IntegrationTests
         [OneTimeTearDown]
         public async Task TearDown()
         {
-            await _documentClient.DeleteDocumentCollectionAsync(_collection.Resource.SelfLink);
+         //   await this._container.DeleteContainerAsync();
         }
     }
 }

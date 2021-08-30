@@ -1,40 +1,36 @@
-﻿namespace PaymentGateway.Api.ComponentTests.InMemory.CardPayment
+﻿namespace PaymentGateway.Api.ComponentTests.OutOfProcess
 {
-    using System;
     using System.Net.Http.Json;
     using System.Threading.Tasks;
+    using InMemory;
     using Models;
-    using Moq;
     using NUnit.Framework;
     using TestStack.BDDfy;
 
     [Story(AsA = "As a merchant",
         IWant = "I want to make payments to acquiring banks",
         SoThat = "I can be paid for selling goods")]
-    public class PaymentGatewayApiCapturePaymentTests : PaymentGatewayApiCardProcessingTestsBase
+    public class PaymentGatewayApiCapturePaymentTestsOutOfProcess : PaymentGatewayApiCardProcessingTestsBase
     {
         [Test]
+        [Category("OutOfProcess")]
         public void MakePaymentToGatewayWithValidCardWhichCanBeCaptured()
         {
             this.Given(s => s.Given_A_Payment_Gateway_Api())
                 .And(s => s.Valid_Card_Details())
                 .When(s => s.When_Processing_The_Card_Payment())
                 .Then(s => s.Then_A_201_Created_Is_Returned())
-                .And(s=> s.The_Response_Body_Indicates_Success())
-                .And(s=> s.The_Response_Is_Persisted())
+                .And(s => s.The_Response_Body_Indicates_Success())
+                .And(s => s.The_Response_Is_Persisted())
                 .BDDfy();
         }
 
         protected override void The_Response_Is_Persisted()
         {
-            this._cardPaymentCommand.Verify(command => command.Execute(It.Is<CardPaymentData>(data =>
-                data.PaymentReference == _card.PaymentReference &&
-                data.CardNumber == _card.CardNumber &&
-                data.Id == _card.PaymentReference &&
-                data.Amount == _card.Amount &&
-                data.CVV == _card.CVV &&
-                data.ExpiryMonth == _card.ExpiryMonth &&
-                data.ExpiryYear == _card.ExpiryYear)));
+            // using Honey Comb testing:
+            // https://engineering.atspotify.com/2018/01/11/testing-of-microservices/
+            // we could get rid of the integration test saving to the Db, and treat the above fixture 
+            // as a big sociable integration test, left this out for now
         }
 
         private async Task The_Response_Body_Indicates_Success()

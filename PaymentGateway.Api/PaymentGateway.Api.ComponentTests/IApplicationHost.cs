@@ -1,0 +1,9 @@
+﻿namespace PaymentGateway.Api.ComponentTests
+{
+    using System.Net.Http;
+
+    public interface IApplicationHost
+    {
+        HttpClient CreateClient();
+    }
+}

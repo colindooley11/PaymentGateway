@@ -1,0 +1,8 @@
+version: '3.4'
+
+services:
+  paymentgateway.api:
+    image: ${DOCKER_REGISTRY-}paymentgatewayapi
+    build:
+      context: .
+      dockerfile: PaymentGateway.Api\Dockerfile

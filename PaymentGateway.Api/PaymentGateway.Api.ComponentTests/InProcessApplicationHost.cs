@@ -4,11 +4,11 @@
     using Commands;
     using Microsoft.AspNetCore.Mvc.Testing;
 
-    public class InProcessWebApplicationHost
+    public class InProcessApplicationHost : IApplicationHost
     {
         private readonly CustomWebApplicationFactory<Startup> _webApplicationFactory;
 
-        public InProcessWebApplicationHost(ISaveCardPaymentCommand cardPaymentCommand)
+        public InProcessApplicationHost(ISaveCardPaymentCommand cardPaymentCommand)
         {
             _webApplicationFactory = new CustomWebApplicationFactory<Startup>(cardPaymentCommand);
         }

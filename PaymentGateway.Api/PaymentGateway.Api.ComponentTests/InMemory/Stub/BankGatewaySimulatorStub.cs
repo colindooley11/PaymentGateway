@@ -8,7 +8,7 @@ namespace PaymentGateway.Api.ComponentTests.InMemory.Stub
     {
         public Task<AcquiringBankResponse> CapturePayment(CardPayment cardPayment)
         {
-            string status = cardPayment.CardNumber switch
+            var status = cardPayment.CardNumber switch
             {
                 MagicCards.Success => "Successful",
                 _ => "Declined"
