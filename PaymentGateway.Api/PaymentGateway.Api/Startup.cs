@@ -1,10 +1,12 @@
 namespace PaymentGateway.Api
 {
+    using Builders;
     using Commands;
     using FluentValidation.AspNetCore;
     using Gateways;
     using Microsoft.AspNetCore.Builder;
     using Microsoft.AspNetCore.Hosting;
+    using Microsoft.Azure.Cosmos.Fluent;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Hosting;
@@ -29,11 +31,18 @@ namespace PaymentGateway.Api
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "PaymentGateway.Api", Version = "v1" });
             });
 
+            this.BuildCosmosFactory(services,Configuration["CosmosAuthEndpoint"], Configuration["CosmosAuthKey"], "CardPayments");
             services.AddSingleton<IAcquiringBankGateway>(new AcquiringBankGatewayNoOp("authenticationKey"));
-            services.AddSingleton<ISaveCardPaymentCommand>(new SaveCardPaymentCommandNoOp("connectionString"));
-
+            services.AddSingleton<ISaveCardPaymentCommand,SaveCardPaymentCommand>();
             services.AddMvc().AddFluentValidation(configuration =>
                 configuration.RegisterValidatorsFromAssemblyContaining<Program>());
+        }
+
+        protected virtual void BuildCosmosFactory(IServiceCollection services, string accountEndpoint, string authKeyOrResourceToken, string cardpaymentscontainer)
+        {
+            var cosmosBuilderFactory = new CosmosBuilderFactory();
+            var container = cosmosBuilderFactory.Build(accountEndpoint, authKeyOrResourceToken, cardpaymentscontainer, "PaymentGateway.Api");
+            services.AddSingleton(container);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

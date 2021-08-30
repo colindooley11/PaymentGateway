@@ -1,24 +1,21 @@
-namespace PaymentGateway.Api.IntegrationTests
+namespace PaymentGateway.Api.Commands
 {
     using System.Threading.Tasks;
-    using Commands;
-    using Microsoft.Azure.Documents.Client;
+    using Microsoft.Azure.Cosmos;
     using Models;
 
     public class SaveCardPaymentCommand : ISaveCardPaymentCommand
     {
-        private readonly string _documentCollectionUri;
-        private readonly DocumentClient _documentClient;
+        private readonly Container _cardPaymentContainer;
 
-        public SaveCardPaymentCommand(string documentCollectionUri, DocumentClient documentClient)
+        public SaveCardPaymentCommand(Container cardPaymentContainer)
         {
-            _documentCollectionUri = documentCollectionUri;
-            _documentClient = documentClient;
+            _cardPaymentContainer = cardPaymentContainer;
         }
 
-        public async Task Execute(CardPayment cardPayment)
+        public async Task Execute(CardPaymentData cardPaymentData)
         {
-            await _documentClient.CreateDocumentAsync(_documentCollectionUri, cardPayment);
+            await _cardPaymentContainer.CreateItemAsync(cardPaymentData, new PartitionKey(cardPaymentData.PaymentReference.ToString()));
         }
     }
 }

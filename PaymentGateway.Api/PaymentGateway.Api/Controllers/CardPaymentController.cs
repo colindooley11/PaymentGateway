@@ -3,6 +3,7 @@
     using System.Threading.Tasks;
     using Commands;
     using Gateways;
+    using Mapper;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.Extensions.Logging;
     using Models;
@@ -24,12 +25,12 @@
 
         [HttpPost]
         [Route("ProcessPayment")]
-        public async Task<ActionResult> Post([FromBody]CardPayment cardPayment)
+        public async Task<ActionResult> Post([FromBody] CardPayment cardPayment)
         {
-            var bankResponse = await this._acquiringBankGateway.CapturePayment(cardPayment); 
+            var bankResponse = await this._acquiringBankGateway.CapturePayment(cardPayment);
             if (bankResponse.Status == "Successful")
             {
-                this._cardPaymentCommand.Execute(cardPayment);
+                await this._cardPaymentCommand.Execute(CardPaymentMapper.ToCardPaymentData(cardPayment));
                 return this.Created(string.Empty, new PaymentGatewayResponse { Status = "Successful" });
             }
             return this.Ok();

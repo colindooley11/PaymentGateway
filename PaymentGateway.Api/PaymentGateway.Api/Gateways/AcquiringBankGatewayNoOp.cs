@@ -13,7 +13,12 @@
         }
         public Task<AcquiringBankResponse> CapturePayment(CardPayment cardPayment)
         {
-           return Task.FromResult(new AcquiringBankResponse());
+            var status = cardPayment.CardNumber switch
+            {
+                "4444333322221111" => "Successful",
+                _ => "Declined"
+            };
+            return Task.FromResult(new AcquiringBankResponse { Status = status });
         }
     }
 }
