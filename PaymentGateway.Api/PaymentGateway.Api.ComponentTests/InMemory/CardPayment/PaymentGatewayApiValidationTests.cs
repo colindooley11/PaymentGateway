@@ -12,19 +12,19 @@ namespace PaymentGateway.Api.ComponentTests.InMemory.CardPayment
         [Test]
         public void WhenAPaymentIsSuccessful()
         {
-            this.Given(s => s.Given_A_Payment_Gateway_Api())
+            this.Given(s => s.A_Payment_Gateway_Api())
                 .And(s=> s.Valid_Card_Details())
-                .When(s => s.When_Processing_The_Card_Payment())
-                .Then(s => s.Then_A_201_Created_Is_Returned())
+                .When(s => s.Processing_The_Card_Payment())
+                .Then(s => s.A_201_Created_Is_Returned())
                 .BDDfy();
         }
 
         [Test]
         public void WhenCardDetailsAreInvalid()
         {
-            this.Given(s => s.Given_A_Payment_Gateway_Api())
+            this.Given(s => s.A_Payment_Gateway_Api())
                 .And(s => s.Invalid_Card_Details())
-                .When(s => s.When_Processing_The_Card_Payment())
+                .When(s => s.Processing_The_Card_Payment())
                 .Then(s => s.Then_A_400_Bad_Request_Is_Returned())
                 .BDDfy();
         }

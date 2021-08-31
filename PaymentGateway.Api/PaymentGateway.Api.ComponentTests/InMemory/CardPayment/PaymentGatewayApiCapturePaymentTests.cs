@@ -18,10 +18,10 @@
         [Test]
         public void MakePaymentToGatewayWithValidCardWhichCanBeCaptured()
         {
-            this.Given(s => s.Given_A_Payment_Gateway_Api())
+            this.Given(s => s.A_Payment_Gateway_Api())
                 .And(s => s.Valid_Card_Details())
-                .When(s => s.When_Processing_The_Card_Payment())
-                .Then(s => s.Then_A_201_Created_Is_Returned())
+                .When(s => s.Processing_The_Card_Payment())
+                .Then(s => s.A_201_Created_Is_Returned())
                 .And(s=> s.The_Response_Body_Indicates_Success())
                 .And(s=> s.The_Response_Is_Persisted())
                 .BDDfy();

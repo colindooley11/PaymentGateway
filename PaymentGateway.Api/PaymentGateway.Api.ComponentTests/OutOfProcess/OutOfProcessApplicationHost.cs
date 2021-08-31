@@ -1,4 +1,4 @@
-﻿namespace PaymentGateway.Api.ComponentTests
+﻿namespace PaymentGateway.Api.ComponentTests.OutOfProcess
 {
     using System;
     using System.Net.Http;
