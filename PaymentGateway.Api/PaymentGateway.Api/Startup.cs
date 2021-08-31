@@ -11,6 +11,7 @@ namespace PaymentGateway.Api
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Hosting;
     using Microsoft.OpenApi.Models;
+    using ValidationFilter;
 
     public class Startup
     {
@@ -24,7 +25,10 @@ namespace PaymentGateway.Api
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddControllers();
+            services.AddControllers(options =>
+                options.Filters.Add<ValidateModelFilter>()
+            ).ConfigureApiBehaviorOptions(options => { options.SuppressModelStateInvalidFilter = true; });
+
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "PaymentGateway.Api", Version = "v1" });

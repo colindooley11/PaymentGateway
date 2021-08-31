@@ -61,14 +61,14 @@ namespace PaymentGateway.Api.ComponentTests.InMemory
             Assert.AreEqual(HttpStatusCode.Created, _result.StatusCode);
         }
 
-        protected void Then_A_400_Bad_Request_Is_Returned()
+        protected void A_400_Bad_Request_Is_Returned()
         {
             Assert.AreEqual(HttpStatusCode.BadRequest, _result.StatusCode);
         }
 
-        protected void Invalid_Card_Details()
+        protected void Invalid_Card_Details(CardPaymentRequest cardPaymentRequest)
         {
-            _card = new CardPaymentRequest();
+            _card = cardPaymentRequest;
         }
 
         protected void Valid_Card_Details()
