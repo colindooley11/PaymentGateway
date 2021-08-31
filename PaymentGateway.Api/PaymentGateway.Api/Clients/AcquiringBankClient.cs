@@ -9,6 +9,7 @@
     public class AcquiringBankClient
     {
         private readonly HttpClient _client;
+
         public HttpClient Client { get; }
 
         public AcquiringBankClient(HttpClient client)

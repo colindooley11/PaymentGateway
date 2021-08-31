@@ -1,7 +1,6 @@
 ﻿namespace PaymentGateway.Api.Validators
 {
     using FluentValidation;
-    using Models;
     using Models.Web;
 
     public class CardPaymentValidator : AbstractValidator<CardPaymentRequest>

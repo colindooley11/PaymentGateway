@@ -5,7 +5,6 @@ namespace PaymentGateway.Api
     using Clients;
     using Commands;
     using FluentValidation.AspNetCore;
-    using Gateways;
     using Microsoft.AspNetCore.Builder;
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.Extensions.Configuration;

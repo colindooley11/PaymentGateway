@@ -21,10 +21,10 @@
         protected override IHostBuilder CreateHostBuilder()
         {
             return Host.CreateDefaultBuilder()
-                .ConfigureWebHostDefaults(webBuilder =>
-                {
-                    webBuilder.UseStartup<TStartup>();
-                });
+            .ConfigureWebHostDefaults(webBuilder =>
+            {
+                webBuilder.UseStartup<TStartup>();
+            });
         }
 
         protected override void ConfigureWebHost(IWebHostBuilder builder)

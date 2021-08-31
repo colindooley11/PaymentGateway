@@ -30,8 +30,8 @@
         {
             // using Honey Comb testing:
             // https://engineering.atspotify.com/2018/01/11/testing-of-microservices/
-            // we could get rid of the integration test saving to the Db, and treat the above fixture 
-            // as a big sociable integration test, left this out for now
+            // we could get rid of the integration test saving to the Db in PaymentGateway.Api.IntegrationTests, and treat the above fixture 
+            // as a big sociable integration test, but I've left this approach out
         }
 
         private async Task The_Response_Body_Indicates_Success()

@@ -9,8 +9,8 @@ namespace PaymentGateway.Api.ComponentTests.InMemory
     using System.Text;
     using System.Text.Json;
     using System.Threading.Tasks;
+    using BankSimulator;
     using Commands;
-    using Gateways;
     using Models.Web;
     using Moq;
     using Newtonsoft.Json;

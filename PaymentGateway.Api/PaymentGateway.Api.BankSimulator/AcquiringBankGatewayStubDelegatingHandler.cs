@@ -5,7 +5,6 @@
     using System.Net.Http.Json;
     using System.Threading;
     using System.Threading.Tasks;
-    using ComponentTests;
     using Models.Web;
 
     public class AcquiringBankGatewayStubDelegatingHandler : DelegatingHandler

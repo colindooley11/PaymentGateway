@@ -1,4 +1,4 @@
-namespace PaymentGateway.Api.ComponentTests
+namespace PaymentGateway.Api.BankSimulator
 {
     public static class MagicCards
     {

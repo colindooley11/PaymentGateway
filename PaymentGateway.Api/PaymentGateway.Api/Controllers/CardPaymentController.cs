@@ -1,14 +1,11 @@
 ﻿namespace PaymentGateway.Api.Controllers
 {
-    using System;
     using System.Threading.Tasks;
     using Clients;
     using Commands;
-    using Gateways;
     using Mapper;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.Extensions.Logging;
-    using Models;
     using Models.Web;
 
     [ApiController]

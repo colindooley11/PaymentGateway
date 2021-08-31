@@ -2,7 +2,6 @@ namespace PaymentGateway.Api.Commands
 {
     using System.Threading.Tasks;
     using Microsoft.Azure.Cosmos;
-    using Models;
     using Models.Data;
 
     public class SaveCardPaymentCommand : ISaveCardPaymentCommand
