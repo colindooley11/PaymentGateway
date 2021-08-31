@@ -1,21 +1,17 @@
 namespace PaymentGateway.Api
 {
-    using System.Net.Http;
-    using System.Net.Http.Json;
-    using System.Threading.Tasks;
+    using BankSimulator;
     using Builders;
+    using Clients;
     using Commands;
     using FluentValidation.AspNetCore;
     using Gateways;
     using Microsoft.AspNetCore.Builder;
     using Microsoft.AspNetCore.Hosting;
-    using Microsoft.Azure.Cosmos.Fluent;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Hosting;
     using Microsoft.OpenApi.Models;
-    using Models;
-    using Models.Web;
 
     public class Startup
     {
@@ -29,7 +25,6 @@ namespace PaymentGateway.Api
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-
             services.AddControllers();
             services.AddSwaggerGen(c =>
             {
@@ -38,7 +33,10 @@ namespace PaymentGateway.Api
 
             this.BuildCosmosFactory(services, Configuration["CosmosAuthEndpoint"], Configuration["CosmosAuthKey"],
                 "CardPayments");
-            services.AddSingleton<IAcquiringBankGateway, AcquiringBankGateway>();
+
+            services.AddHttpClient<AcquiringBankClient>()
+                .AddHttpMessageHandler(() => new AcquiringBankGatewayStubDelegatingHandler());
+
             services.AddSingleton<ISaveCardPaymentCommand, SaveCardPaymentCommand>();
             services.AddMvc().AddFluentValidation(configuration =>
                 configuration.RegisterValidatorsFromAssemblyContaining<Program>());
@@ -73,22 +71,6 @@ namespace PaymentGateway.Api
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
-        }
-    }
-
-    public class AcquiringBankGateway : IAcquiringBankGateway
-    {
-        private readonly IHttpClientFactory _clientFactory;
-
-        public AcquiringBankGateway(IHttpClientFactory clientFactory)
-        {
-            _clientFactory = clientFactory;
-        }
-
-        public async Task<AcquiringBankResponse> CapturePayment(CardPaymentRequest cardPaymentRequest)
-        {
-            var client = _clientFactory.CreateClient("AcquiringBankGateway");
-            return new AcquiringBankResponse();
         }
     }
 }

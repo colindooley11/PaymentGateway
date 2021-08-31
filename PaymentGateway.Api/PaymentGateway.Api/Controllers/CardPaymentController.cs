@@ -1,6 +1,8 @@
 ﻿namespace PaymentGateway.Api.Controllers
 {
+    using System;
     using System.Threading.Tasks;
+    using Clients;
     using Commands;
     using Gateways;
     using Mapper;
@@ -14,21 +16,21 @@
     public class CardPaymentController : ControllerBase
     {
         private readonly ILogger<CardPaymentController> _logger;
-        private readonly IAcquiringBankGateway _acquiringBankGateway;
+        private readonly AcquiringBankClient _acquiringBankClient;
         private readonly ISaveCardPaymentCommand _cardPaymentCommand;
 
-        public CardPaymentController(ILogger<CardPaymentController> logger, IAcquiringBankGateway acquiringBankGateway, ISaveCardPaymentCommand cardPaymentCommand)
+        public CardPaymentController(ILogger<CardPaymentController> logger, AcquiringBankClient acquiringBankClient, ISaveCardPaymentCommand cardPaymentCommand)
         {
             _logger = logger;
-            _acquiringBankGateway = acquiringBankGateway;
+            _acquiringBankClient = acquiringBankClient;
             _cardPaymentCommand = cardPaymentCommand;
         }
 
         [HttpPost]
         [Route("ProcessPayment")]
-        public async Task<ActionResult> Post([FromBody] CardPaymentRequest cardPaymentRequest)
+        public async Task<IActionResult> Post([FromBody] CardPaymentRequest cardPaymentRequest)
         {
-            var bankResponse = await this._acquiringBankGateway.CapturePayment(cardPaymentRequest);
+            var bankResponse = await this._acquiringBankClient.ProcessPayment(cardPaymentRequest).ConfigureAwait(false);
             if (bankResponse.Status == "Successful")
             {
                 await this._cardPaymentCommand.Execute(CardPaymentMapper.ToCardPaymentData(cardPaymentRequest));

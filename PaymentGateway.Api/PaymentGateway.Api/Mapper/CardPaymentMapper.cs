@@ -1,6 +1,5 @@
 namespace PaymentGateway.Api.Mapper
 {
-    using Models;
     using Models.Data;
     using Models.Web;
 

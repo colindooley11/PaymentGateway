@@ -4,7 +4,6 @@
     using System.Net.Http;
     using System.Net.Http.Json;
     using System.Threading.Tasks;
-    using Models;
     using Models.Web;
 
     public class AcquiringBankClient
@@ -18,10 +17,11 @@
             _client = client;
         }
 
-        public Task<AcquiringBankResponse> ProcessPayment(CardPaymentRequest cardPayment)
+        public async Task<AcquiringBankResponse> ProcessPayment(CardPaymentRequest cardPaymentRequest)
         {
-           // _client.PostAsJsonAsync(new Uri("/bigbak"))
-           return Task.FromResult(new AcquiringBankResponse());
+            var response = await _client.PostAsJsonAsync("/processpayment", cardPaymentRequest);
+            response.EnsureSuccessStatusCode();
+            return await response.Content.ReadFromJsonAsync<AcquiringBankResponse>();
         }
     }
 }
