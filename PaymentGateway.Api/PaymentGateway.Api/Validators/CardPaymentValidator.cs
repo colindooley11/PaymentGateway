@@ -34,6 +34,18 @@
                 WithMessage("Please pass a 2 digit year between 18 and 30")
                 .LessThanOrEqualTo(30)
                 .WithMessage("Please pass a 2 digit year between 18 and 30");
+
+            RuleFor(payment => payment.Currency)
+                .NotEmpty()
+                .WithMessage("Please pass a 3 letter currency code")
+                .MaximumLength(3)
+                .WithMessage("Please pass a 3 letter currency code")
+                .MinimumLength(3)
+                .WithMessage("Please pass a 3 letter currency code");
+
+            RuleFor(payment => payment.Amount)
+                .GreaterThan(0)
+                .WithMessage("Please supply a positive amount");
         }
     }
 }
