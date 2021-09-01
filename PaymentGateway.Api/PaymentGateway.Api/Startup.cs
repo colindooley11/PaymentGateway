@@ -44,6 +44,8 @@ namespace PaymentGateway.Api
                 options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
             });
 
+            services.AddApplicationInsightsTelemetry(Configuration["AppInsightsKey"]);
+
             this.BuildCosmosFactory(services, Configuration["CosmosAuthEndpoint"], Configuration["CosmosAuthKey"],
                 "CardPayments");
             services.AddSingleton<ISaveCardPaymentCommand, SaveCardPaymentCosmosCommand>();
@@ -124,10 +126,8 @@ namespace PaymentGateway.Api
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "PaymentGateway.Api v1"));
             }
 
-            if (!env.IsDevelopment())
-            {
-                app.UseHttpsRedirection();
-            }
+            app.UseHttpsRedirection();
+           
 
             app.UseRouting();
 

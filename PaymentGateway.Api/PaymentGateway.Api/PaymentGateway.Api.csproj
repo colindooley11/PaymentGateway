@@ -16,11 +16,18 @@
         <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.11.1" />
         <PackageReference Include="Swashbuckle.AspNetCore" Version="6.1.1" />
         <PackageReference Include="Swashbuckle.AspNetCore.Filters" Version="7.0.2" />
+        <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.17.0" />
     </ItemGroup>
 
     <ItemGroup>
       <ProjectReference Include="..\PaymentGateway.Api.BankSimulator\PaymentGateway.Api.BankSimulator.csproj" />
       <ProjectReference Include="..\PaymentGateway.Api.Models\PaymentGateway.Api.Models.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Content Update="appsettings.json">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Content>
     </ItemGroup>
 
 </Project>
