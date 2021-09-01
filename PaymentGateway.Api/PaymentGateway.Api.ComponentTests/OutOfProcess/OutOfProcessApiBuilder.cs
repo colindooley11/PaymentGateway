@@ -3,7 +3,7 @@
     using System;
     using System.Net.Http;
 
-    public class OutOfProcessApplicationHost : IApplicationHost
+    public class OutOfProcessApiBuilder : IApiBuilder
     {
         public HttpClient CreateClient()
         {

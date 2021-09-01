@@ -4,11 +4,11 @@ namespace PaymentGateway.Api.Commands
     using Microsoft.Azure.Cosmos;
     using Models.Data;
 
-    public class SaveCardPaymentCommand : ISaveCardPaymentCommand
+    public class SaveCardPaymentCosmosCommand : ISaveCardPaymentCommand
     {
         private readonly Container _cardPaymentContainer;
 
-        public SaveCardPaymentCommand(Container cardPaymentContainer)
+        public SaveCardPaymentCosmosCommand(Container cardPaymentContainer)
         {
             _cardPaymentContainer = cardPaymentContainer;
         }

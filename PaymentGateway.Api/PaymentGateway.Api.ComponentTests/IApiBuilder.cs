@@ -2,7 +2,7 @@
 {
     using System.Net.Http;
 
-    public interface IApplicationHost
+    public interface IApiBuilder
     {
         HttpClient CreateClient();
     }

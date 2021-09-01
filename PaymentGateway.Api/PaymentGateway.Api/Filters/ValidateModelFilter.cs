@@ -1,4 +1,4 @@
-﻿namespace PaymentGateway.Api.ValidationFilter
+﻿namespace PaymentGateway.Api.Filters
 {
     using System.Linq;
     using System.Threading.Tasks;

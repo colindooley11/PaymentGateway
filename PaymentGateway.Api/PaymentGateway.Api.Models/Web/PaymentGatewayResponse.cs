@@ -4,6 +4,6 @@
 
     public class PaymentGatewayResponse
     {
-        public string Status { get; set; }
+        public PaymentStatusEnum Status { get; set; }
     }
 }

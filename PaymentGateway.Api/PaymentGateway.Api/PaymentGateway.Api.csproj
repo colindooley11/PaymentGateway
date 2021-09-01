@@ -18,10 +18,6 @@
     </ItemGroup>
 
     <ItemGroup>
-        <Folder Include="Controllers\" />
-    </ItemGroup>
-
-    <ItemGroup>
       <ProjectReference Include="..\PaymentGateway.Api.BankSimulator\PaymentGateway.Api.BankSimulator.csproj" />
       <ProjectReference Include="..\PaymentGateway.Api.Models\PaymentGateway.Api.Models.csproj" />
     </ItemGroup>

@@ -1,15 +1,15 @@
 namespace PaymentGateway.Api.IntegrationTests
 {
     using System;
-    using System.Linq;
     using System.Threading.Tasks;
     using Builders;
     using Commands;
     using Microsoft.Azure.Cosmos;
     using Models.Data;
+    using Query;
     using NUnit.Framework;
 
-    public class Given_A_Card_Payment_When_Saving_Card_Payment
+    public class Given_Payment_Details_When_Retrieving_A_Card
     {
         private Container _container;
         private Guid _paymentReference;
@@ -20,13 +20,14 @@ namespace PaymentGateway.Api.IntegrationTests
             _container = new CosmosBuilderFactory().Build("https://paymentgateway-cosmos-db.documents.azure.com:443/",
                 "XfvKmJMieiWNmKNcWr9LTX8HU27qvjyuPbZN5f8XviPTrM5SI9bWHosAq3FEs8WR1Nhb4j4wqSwBdGxyKI5lZA==",
                 "CardPaymentIntTests", "PaymentGateway.Api.IntegrationTests");
+
             var saveCardPaymentCommand = new SaveCardPaymentCosmosCommand(_container);
             _paymentReference = Guid.NewGuid();
             var cardPaymentData = new CardPaymentData
             {
                 Id = _paymentReference,
                 PaymentReference = _paymentReference,
-                CardNumber = "444433******1111",
+                CardNumber = "4444333322221111",
                 Amount = 50,
                 Currency = "GBP",
                 ExpiryMonth = 1,
@@ -34,26 +35,22 @@ namespace PaymentGateway.Api.IntegrationTests
             };
 
             await saveCardPaymentCommand.Execute(cardPaymentData);
-        }
 
-        [Test]
-        public void Then_The_Card_Payment_Details_Are_Saved()
-        {
-            var query = this._container.GetItemLinqQueryable<CardPaymentData>(allowSynchronousQueryExecution: true)
-                .Where(payment => payment.PaymentReference.ToString() == _paymentReference.ToString());
+            var getPaymentDetailsQuery  = new GetPaymentDetailsCosmosQuery(_container);
 
-            var card = query.ToList().First();
-            Assert.AreEqual(card.CardNumber, "4444333322221111");
-            Assert.AreEqual(card.Amount, 50);
-            Assert.AreEqual(card.Currency, "GBP");
-            Assert.AreEqual(card.ExpiryMonth, 1);
-            Assert.AreEqual(card.ExpiryYear, 22);
+            var paymentDetailsResponse =  await getPaymentDetailsQuery.Execute(cardPaymentData.PaymentReference);
+
+            Assert.AreEqual(cardPaymentData.ExpiryYear, paymentDetailsResponse.ExpiryYear);
+            Assert.AreEqual(cardPaymentData.Amount, paymentDetailsResponse.Amount);
+            Assert.AreEqual("444433******1111", paymentDetailsResponse.FirstSixLastFour);
+            Assert.AreEqual(cardPaymentData.ExpiryMonth, paymentDetailsResponse.ExpiryMonth);
+            Assert.AreEqual(cardPaymentData.Currency, paymentDetailsResponse.Currency);
         }
 
         [OneTimeTearDown]
         public async Task TearDown()
         {
-            await this._container.DeleteContainerAsync();
+           await this._container.DeleteContainerAsync();
         }
     }
 }

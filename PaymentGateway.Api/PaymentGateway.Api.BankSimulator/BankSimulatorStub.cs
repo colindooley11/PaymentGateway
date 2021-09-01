@@ -7,15 +7,15 @@
     using System.Threading.Tasks;
     using Models.Web;
 
-    public class AcquiringBankGatewayStubDelegatingHandler : DelegatingHandler
+    public class BankSimulatorStub : DelegatingHandler
     {
         protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
         {
             var cardPaymentRequest = await request.Content.ReadFromJsonAsync<CardPaymentRequest>();
             var status = cardPaymentRequest.CardNumber switch
             {
-                MagicCards.Success => "Successful",
-                _ => "Declined"
+                MagicCards.Success => PaymentStatusEnum.Success,
+                _ => PaymentStatusEnum.Failure
             };
 
             return new HttpResponseMessage(HttpStatusCode.OK)

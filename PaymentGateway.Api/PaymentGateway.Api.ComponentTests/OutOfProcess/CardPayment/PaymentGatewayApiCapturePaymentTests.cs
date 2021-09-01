@@ -1,9 +1,8 @@
-﻿namespace PaymentGateway.Api.ComponentTests.OutOfProcess
+﻿namespace PaymentGateway.Api.ComponentTests.OutOfProcess.CardPayment
 {
     using System.Net.Http.Json;
     using System.Threading.Tasks;
     using InMemory;
-    using Models;
     using Models.Web;
     using NUnit.Framework;
     using TestStack.BDDfy;
@@ -14,10 +13,9 @@
     public class PaymentGatewayApiCapturePaymentTestsOutOfProcess : PaymentGatewayApiCardProcessingTestsBase
     {
         [Test]
-        [Category("OutOfProcess")]
         public void MakePaymentToGatewayWithValidCardWhichCanBeCaptured()
         {
-            this.Given(s => s.A_Payment_Gateway_Api())
+            this.Given(s => s.An_Out_Of_Process_Payment_Gateway_Api())
                 .And(s => s.Valid_Card_Details())
                 .When(s => s.Processing_The_Card_Payment())
                 .Then(s => s.A_201_Created_Is_Returned())

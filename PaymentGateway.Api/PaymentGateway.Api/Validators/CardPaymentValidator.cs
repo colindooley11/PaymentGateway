@@ -11,10 +11,9 @@
             RuleFor(payment => payment.PaymentReference)
                 .NotNull()
                 .WithMessage("Payment reference can not be empty")
-                .Must((request, guid) =>
+                .Must((_, guid) =>
                 {
-                    Guid parsedGuid;
-                    Guid.TryParse(guid.ToString(), out parsedGuid);
+                    Guid.TryParse(guid.ToString(), out var parsedGuid);
                     return parsedGuid != Guid.Empty;
                 }).WithMessage("Payment reference must be guid and not empty")
                 ;
@@ -35,11 +34,6 @@
                 WithMessage("Please pass a 2 digit year between 18 and 30")
                 .LessThanOrEqualTo(30)
                 .WithMessage("Please pass a 2 digit year between 18 and 30");
-
-
-
-
-
         }
     }
 }

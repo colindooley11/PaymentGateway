@@ -2,6 +2,7 @@
 {
     using System;
     using Newtonsoft.Json;
+    using Web;
 
     public class CardPaymentData
     {
@@ -17,9 +18,9 @@
 
         public string Currency { get; set; }
 
-        public int CVV { get; set; }
-
         public Guid PaymentReference { get; set; }
+
+        public PaymentStatusEnum Status { get; set; }
 
     }
 }

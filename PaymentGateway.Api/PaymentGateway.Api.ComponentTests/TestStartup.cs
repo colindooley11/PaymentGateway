@@ -9,8 +9,7 @@
         {
         }
 
-        protected override void BuildCosmosFactory(IServiceCollection services, string accountEndpoint, string authKeyOrResourceToken,
-            string cardpaymentscontainer)
+        protected override void BuildCosmosFactory(IServiceCollection services, string accountEndpoint, string authKeyOrResourceToken, string cardPaymentsContainer)
         {
             // don't do anything in memory 
         }

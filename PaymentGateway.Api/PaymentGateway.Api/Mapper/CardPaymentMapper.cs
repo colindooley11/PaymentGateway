@@ -1,11 +1,12 @@
 namespace PaymentGateway.Api.Mapper
 {
+    using System.Linq;
     using Models.Data;
     using Models.Web;
 
     public class CardPaymentMapper
     {
-        public static CardPaymentData ToCardPaymentData(CardPaymentRequest cardPaymentRequest)
+        public static CardPaymentData ToCardPaymentData(CardPaymentRequest cardPaymentRequest, PaymentStatusEnum bankResponseStatus)
         {
             return new CardPaymentData
             {
@@ -14,10 +15,15 @@ namespace PaymentGateway.Api.Mapper
                 Amount = cardPaymentRequest.Amount,
                 ExpiryMonth = cardPaymentRequest.ExpiryMonth,
                 ExpiryYear = cardPaymentRequest.ExpiryYear,
-                CVV = cardPaymentRequest.CVV,
-                CardNumber = cardPaymentRequest.CardNumber,
-                Currency = cardPaymentRequest.Currency
+                CardNumber = GetFirstSixLastFour(cardPaymentRequest), 
+                Currency = cardPaymentRequest.Currency,
+                Status = bankResponseStatus
             };
+        }
+
+        private static string GetFirstSixLastFour(CardPaymentRequest cardPaymentRequest)
+        {
+            return string.Concat(new string(cardPaymentRequest.CardNumber.Take(6).ToArray()), new string('*', cardPaymentRequest.CardNumber.Length - 10), new string(cardPaymentRequest.CardNumber.TakeLast(4).ToArray()));
         }
     }
 }

@@ -2,6 +2,6 @@
 {
     public class AcquiringBankResponse
     {
-        public string Status { get; set; }
+        public PaymentStatusEnum Status { get; set; }
     }
 }

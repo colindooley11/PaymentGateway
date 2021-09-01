@@ -3,6 +3,7 @@
     using System.Threading.Tasks;
     using Clients;
     using Commands;
+    using Filters;
     using Mapper;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.Extensions.Logging;
@@ -10,6 +11,7 @@
 
     [ApiController]
     [Route("PaymentGateway/[controller]")]
+    [ApiKey]
     public class CardPaymentController : ControllerBase
     {
         private readonly ILogger<CardPaymentController> _logger;
@@ -28,12 +30,8 @@
         public async Task<IActionResult> Post([FromBody] CardPaymentRequest cardPaymentRequest)
         {
             var bankResponse = await this._acquiringBankClient.ProcessPayment(cardPaymentRequest).ConfigureAwait(false);
-            if (bankResponse.Status == "Successful")
-            {
-                await this._cardPaymentCommand.Execute(CardPaymentMapper.ToCardPaymentData(cardPaymentRequest));
-                return this.Created(string.Empty, new PaymentGatewayResponse { Status = "Successful" });
-            }
-            return this.Ok();
+            await this._cardPaymentCommand.Execute(CardPaymentMapper.ToCardPaymentData(cardPaymentRequest, bankResponse.Status));
+            return this.Created(string.Empty, new PaymentGatewayResponse { Status = bankResponse.Status });
         }
     }
 }

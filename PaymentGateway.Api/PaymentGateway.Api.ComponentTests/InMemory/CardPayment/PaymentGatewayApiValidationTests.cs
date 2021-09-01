@@ -16,7 +16,6 @@ namespace PaymentGateway.Api.ComponentTests.InMemory.CardPayment
         SoThat = "I can be paid for selling goods")]
     public class PaymentGatewayApiValidationTests : PaymentGatewayApiCardProcessingTestsBase
     {
-
         private CardPaymentRequest InvalidCardExample = null;
         private string expectedErrorMessage = null;
         private string invalidCardPaymentProperty = null;
@@ -24,18 +23,17 @@ namespace PaymentGateway.Api.ComponentTests.InMemory.CardPayment
         [Test]
         public void WhenAPaymentIsSuccessful()
         {
-            this.Given(s => s.A_Payment_Gateway_Api())
+            this.Given(s => s.An_In_Process_Payment_Gateway_Api())
                 .And(s => s.Valid_Card_Details())
                 .When(s => s.Processing_The_Card_Payment())
                 .Then(s => s.A_201_Created_Is_Returned())
                 .BDDfy();
         }
 
-
         [Test]
         public void WhenCardDetailsAreInvalid()
         {
-            this.Given(s => s.A_Payment_Gateway_Api())
+            this.Given(s => s.An_In_Process_Payment_Gateway_Api())
                 .And(s => s.Invalid_Card_Details(this.InvalidCardExample))
                 .When(s => s.Processing_The_Card_Payment())
                 .Then(s => s.A_400_Bad_Request_Is_Returned())
