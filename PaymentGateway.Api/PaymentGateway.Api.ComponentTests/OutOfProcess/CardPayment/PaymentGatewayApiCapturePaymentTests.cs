@@ -1,6 +1,5 @@
 ﻿namespace PaymentGateway.Api.ComponentTests.OutOfProcess.CardPayment
 {
-    using System.Net.Http.Json;
     using System.Threading.Tasks;
     using InMemory;
     using Models.Web;
@@ -13,7 +12,7 @@
         SoThat = "I can be paid for selling goods")]
     public class PaymentGatewayApiCapturePaymentTestsOutOfProcess : PaymentGatewayApiCardProcessingTestsBase
     {
-        //[Ignore("Need to ensure API is running locally")]
+        [Ignore("Need to ensure API is running locally")]
         [Test]
         public void MakePaymentToGatewayWithValidCardWhichCanBeCaptured()
         {
