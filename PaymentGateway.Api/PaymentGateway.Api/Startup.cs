@@ -1,5 +1,8 @@
 namespace PaymentGateway.Api
 {
+    using System;
+    using System.Collections.Generic;
+    using System.IO;
     using System.Text.Json.Serialization;
     using BankSimulator;
     using Builders;
@@ -14,7 +17,10 @@ namespace PaymentGateway.Api
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Hosting;
     using Microsoft.OpenApi.Models;
+    using PaymentGateway.Api.Swagger;
     using Query;
+    using Swashbuckle.AspNetCore.Filters;
+    using Swashbuckle.AspNetCore.Swagger;
 
     public class Startup
     {
@@ -38,11 +44,6 @@ namespace PaymentGateway.Api
                 options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
             });
 
-            services.AddSwaggerGen(c =>
-            {
-                c.SwaggerDoc("v1", new OpenApiInfo { Title = "PaymentGateway.Api", Version = "v1" });
-            });
-
             this.BuildCosmosFactory(services, Configuration["CosmosAuthEndpoint"], Configuration["CosmosAuthKey"],
                 "CardPayments");
             services.AddSingleton<ISaveCardPaymentCommand, SaveCardPaymentCosmosCommand>();
@@ -56,8 +57,52 @@ namespace PaymentGateway.Api
 
             services.AddAuthorization();
 
-           services.AddAuthentication("ApiKey")
-                .AddScheme<AuthenticationSchemeOptions, BasicAuthenticationHandler>("ApiKey", null);
+            services.AddAuthentication("ApiKey")
+                 .AddScheme<AuthenticationSchemeOptions, ApiKeyAuthenticationHandler>("ApiKey", null);
+
+            ConfigureSwagger(services);
+
+        }
+
+        private static void ConfigureSwagger(IServiceCollection services)
+        {
+            services.AddSwaggerGen(options =>
+            {
+                options.SwaggerDoc("v1", new OpenApiInfo
+                {
+                    Version = "v1",
+                    Title = "PaymentGateway.Api",
+                    Description =
+                        "Naive Payment Gateway API with stubbed Bank simulator",
+                    Contact = new OpenApiContact
+                    {
+                        Name = "Colin Dooley",
+                        Email = "colin_dooley@yahoo.co.uk",
+                        Url = new Uri("https://www.linkedin.com/in/colin-dooley-87106871/")
+                    }
+                });
+
+                options.AddFluentValidationRules();
+                var apiKeySecurityScheme = new OpenApiSecurityScheme
+                {
+                    Name = "APIKey",
+                    In = ParameterLocation.Header,
+                    Type = SecuritySchemeType.ApiKey,
+                    Description = "ApiKey must appear in header!",
+                    Reference = new OpenApiReference { Id = "APIKey", Type = ReferenceType.SecurityScheme }
+
+                };
+
+                var filePath = Path.Combine(AppContext.BaseDirectory, "PaymentGateway.Api.Models.xml"); 
+                options.IncludeXmlComments(filePath);
+
+                options.AddSecurityDefinition(apiKeySecurityScheme.Reference.Id, apiKeySecurityScheme);
+                options.AddSecurityRequirement(new OpenApiSecurityRequirement
+                {
+                    {apiKeySecurityScheme, new string[] { }}
+                });
+                options.AddServer(new OpenApiServer { Url = "/", Description = "Local Development Server" });
+            });
         }
 
         protected virtual void BuildCosmosFactory(IServiceCollection services, string accountEndpoint,

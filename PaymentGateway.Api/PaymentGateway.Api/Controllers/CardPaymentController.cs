@@ -6,9 +6,12 @@
     using Commands;
     using Mapper;
     using Microsoft.AspNetCore.Authorization;
+    using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.Extensions.Logging;
     using Models.Web;
+    using PaymentGateway.Api.Swagger;
+    using Swashbuckle.AspNetCore.Filters;
 
     [Authorize]
     [ApiController]
@@ -28,6 +31,10 @@
 
         [HttpPost]
         [Route("ProcessPayment")]
+        [SwaggerRequestExample(typeof(CardPaymentRequest), typeof(CardPaymentRequestExample))]
+        [ProducesResponseType(typeof(AcquiringBankResponse), StatusCodes.Status201Created)]
+        [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(object), StatusCodes.Status401Unauthorized)]
         public async Task<IActionResult> Post([FromBody] CardPaymentRequest cardPaymentRequest)
         {
             var bankResponse = await this._acquiringBankClient.ProcessPayment(cardPaymentRequest).ConfigureAwait(false);

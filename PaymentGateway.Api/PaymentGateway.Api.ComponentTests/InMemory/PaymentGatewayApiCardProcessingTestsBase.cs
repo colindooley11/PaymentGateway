@@ -29,20 +29,22 @@ namespace PaymentGateway.Api.ComponentTests.InMemory
         public void An_Out_Of_Process_Payment_Gateway_Api()
         {
             _client = new OutOfProcessApiBuilder().CreateClient();
+            _client.DefaultRequestHeaders.Add("ApiKey", "Merchant-1");
         }
 
         public void An_In_Process_Payment_Gateway_Api_Without_Authentication()
         {
-            An_In_Process_Payment_Gateway_Api(() => new BankSimulatorScenarioBuilder(), true);
+            An_In_Process_Payment_Gateway_Api(() => new BankSimulatorScenarioBuilder(), false);
         }
         public void An_In_Process_Payment_Gateway_Api()
         {
-            An_In_Process_Payment_Gateway_Api(() => new BankSimulatorScenarioBuilder(), false);
+            An_In_Process_Payment_Gateway_Api(() => new BankSimulatorScenarioBuilder(), true);
         }
-        public void An_In_Process_Payment_Gateway_Api(Func<BankSimulatorScenarioBuilder> bankSimulatorScenarioBuilder, bool withoutAuthentication)
+        public void An_In_Process_Payment_Gateway_Api(Func<BankSimulatorScenarioBuilder> bankSimulatorScenarioBuilder, bool withAuthentication)
         {
             _cardPaymentCommand = new Mock<ISaveCardPaymentCommand>();
             BankSimulatorScenarioSpy = bankSimulatorScenarioBuilder().Build();
+            
             _client = new InMemoryApiBuilder((collection =>
             {
                 collection.AddSingleton(_cardPaymentCommand.Object);
@@ -55,15 +57,25 @@ namespace PaymentGateway.Api.ComponentTests.InMemory
                     });
 
             })).CreateClient();
-            if (!withoutAuthentication)
+            if (withAuthentication)
             {
-                _client.DefaultRequestHeaders.Add("ApiKey", "letmein");
+                _client.DefaultRequestHeaders.Add("ApiKey", "Merchant-1");
+            }
+            else
+            {
+                _client.DefaultRequestHeaders.Clear();
             }
         }
 
         protected async Task A_201_Created_Is_Returned()
         {
             Assert.AreEqual(HttpStatusCode.Created, _result.StatusCode);
+           
+        }
+
+        protected void Location_Header_Is_Set()
+        {
+            Assert.That(_result.Headers.Location.AbsoluteUri, Is.Not.Null);
         }
 
         protected async Task A_401_UnAuthorised_Is_Returned()

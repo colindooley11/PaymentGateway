@@ -4,7 +4,9 @@
     using System.Threading.Tasks;
     using Mapper;
     using Microsoft.AspNetCore.Authorization;
+    using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Mvc;
+    using PaymentGateway.Api.Models.Web;
     using Query;
 
     [Authorize]
@@ -21,15 +23,18 @@
 
         [HttpGet]
         [Route("{paymentReference:guid}")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(PaymentDetailsResponse))]
+        [ProducesResponseType(typeof(object), StatusCodes.Status401Unauthorized)]
         public async Task<IActionResult> RetrievePaymentDetails(Guid paymentReference)
         {
             var paymentDetails = await _getPaymentDetailsCosmosQuery.Execute(paymentReference);
             if (paymentDetails == null)
             {
-                return new NotFoundResult(); 
+                return new NotFoundResult();
             }
 
-            return new OkObjectResult(CardPaymentMapper.ToPaymentResponse(paymentDetails));
+            var paymentDetailsResponse = CardPaymentMapper.ToPaymentResponse(paymentDetails);
+            return new OkObjectResult(paymentDetailsResponse);
         }
     }
 }

@@ -5,6 +5,7 @@ using Microsoft.Azure.Cosmos;
 namespace PaymentGateway.Api.Query
 {
     using System.Linq;
+    using FluentValidation.Results;
     using Models.Data;
     using Models.Web;
 
@@ -19,8 +20,17 @@ namespace PaymentGateway.Api.Query
 
         public async Task<CardPaymentData> Execute(Guid paymentReference)
         {
-            return this._container
-                .GetItemLinqQueryable<CardPaymentData>(allowSynchronousQueryExecution:true).Where(payment => payment.PaymentReference.ToString() == paymentReference.ToString()).ToList().First();
+            var result = this._container
+                .GetItemQueryIterator<CardPaymentData>(
+                    new QueryDefinition($"SELECT * FROM c WHERE c.PaymentReference = '{paymentReference}'"), null, new QueryRequestOptions {PartitionKey = new PartitionKey(paymentReference.ToString())});
+            CardPaymentData retrievedCardPayment = null;
+
+            foreach (var cardPayment in await result.ReadNextAsync())
+            {
+                retrievedCardPayment = cardPayment;
+            }
+
+            return retrievedCardPayment; 
         }
     }
 }

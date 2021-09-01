@@ -1,11 +1,15 @@
 ﻿namespace PaymentGateway.Api.ComponentTests.InMemory.CardPayment
 {
+    using System.Collections.Generic;
     using System.Net.Http.Json;
+    using System.Text.Json;
+    using System.Text.Json.Serialization;
     using System.Threading.Tasks;
     using Api.BankSimulator;
     using Models.Data;
     using Models.Web;
     using Moq;
+    using Newtonsoft.Json;
     using NUnit.Framework;
     using TestStack.BDDfy;
 
@@ -14,6 +18,9 @@
         SoThat = "I can be paid for selling goods")]
     public class PaymentGatewayApiCapturePaymentTests : PaymentGatewayApiCardProcessingTestsBase
     {
+        /// <summary>
+        /// Fields used by BDDfy
+        /// </summary>
         private string BankSimulatorOutcome;
         private PaymentStatusEnum ExpectedStatusOutcome;
         private string ExpectedMaskedCardNumber;
@@ -25,6 +32,7 @@
                 .And(s => s.Valid_Card_Details())
                 .When(s => s.Processing_The_Card_Payment())
                 .Then(s => s.A_201_Created_Is_Returned())
+                .Then(s => s.Location_Header_Is_Set())
                 .And(s => s.The_Response_Body_Indicates_The_Status_Of_The_Payment())
                 .And(s => s.The_Response_Is_Persisted())
                 .WithExamples(new ExampleTable("BankSimulatorOutcome", "CardNumber", "ExpectedMaskedCardNumber", "ExpectedStatusOutcome")
@@ -37,8 +45,8 @@
 
         private async Task The_Response_Body_Indicates_The_Status_Of_The_Payment()
         {
-            var paymentGatewayResponse =
-                await _result.Content.ReadFromJsonAsync<PaymentGatewayResponse>();
+            var paymentGatewayResponseString = await _result.Content.ReadAsStringAsync();
+            var paymentGatewayResponse = JsonConvert.DeserializeObject<PaymentGatewayResponse>(paymentGatewayResponseString);
             Assert.AreEqual(ExpectedStatusOutcome, paymentGatewayResponse.Status);
         }
 
@@ -57,6 +65,7 @@
             Assert.AreEqual(_card.ExpiryMonth, data.ExpiryMonth);
             Assert.AreEqual(_card.ExpiryYear, data.ExpiryYear);
             Assert.AreEqual(_card.Currency, data.Currency);
+            Assert.AreEqual(ExpectedStatusOutcome, data.Status);
             return true;
         }
     }

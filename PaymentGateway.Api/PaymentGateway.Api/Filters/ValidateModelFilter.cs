@@ -31,7 +31,6 @@
             {
                 Message = errorMessage,
                 PropertyName = parameterName,
-                ErrorMessage = errorMessage
             };
         }
     }

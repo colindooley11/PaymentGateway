@@ -27,6 +27,7 @@ namespace PaymentGateway.Api.ComponentTests.InMemory.CardPayment
                 .And(s => s.Valid_Card_Details())
                 .When(s => s.Processing_The_Card_Payment())
                 .Then(s => s.A_201_Created_Is_Returned())
+                .Then(s => s.Location_Header_Is_Set())
                 .BDDfy();
         }
 
@@ -45,7 +46,9 @@ namespace PaymentGateway.Api.ComponentTests.InMemory.CardPayment
                         { "Month not valid", "Please pass a month between 1 and 12", new CardPaymentRequest { CardNumber = "4444333322221111", Amount = 50, Currency = "GBP", CVV = 123, ExpiryMonth = 15, ExpiryYear = 22, PaymentReference = Guid.NewGuid()}},
                         { "Month not valid", "Please pass a month between 1 and 12", new CardPaymentRequest { CardNumber = "4444333322221111", Amount = 50, Currency = "GBP", CVV = 123, ExpiryMonth = 0, ExpiryYear = 22, PaymentReference = Guid.NewGuid()}},
                         { "Year not valid", "Please pass a 2 digit year between 18 and 30", new CardPaymentRequest { CardNumber = "4444333322221111", Amount = 50, Currency = "GBP", CVV = 123, ExpiryMonth = 12, ExpiryYear = 10, PaymentReference = Guid.NewGuid()}},
-                        { "Year not valid", "Please pass a 2 digit year between 18 and 30", new CardPaymentRequest { CardNumber = "4444333322221111", Amount = 50, Currency = "GBP", CVV = 123, ExpiryMonth = 12, ExpiryYear = 45, PaymentReference = Guid.NewGuid()}
+                        { "Year not valid", "Please pass a 2 digit year between 18 and 30", new CardPaymentRequest { CardNumber = "4444333322221111", Amount = 50, Currency = "GBP", CVV = 123, ExpiryMonth = 12, ExpiryYear = 45, PaymentReference = Guid.NewGuid()}},
+                        { "Currency not supplied", "Please pass a 3 letter currency code", new CardPaymentRequest { CardNumber = "4444333322221111", Amount = 50, Currency = "", CVV = 123, ExpiryMonth = 12, ExpiryYear = 22, PaymentReference = Guid.NewGuid()}},
+                        { "Amount not valid", "Please supply a positive amount", new CardPaymentRequest { CardNumber = "4444333322221111", Amount = 0, Currency = "GBP", CVV = 123, ExpiryMonth = 12, ExpiryYear = 22, PaymentReference = Guid.NewGuid()}
                     }})
                    .BDDfy();
         }
@@ -54,7 +57,7 @@ namespace PaymentGateway.Api.ComponentTests.InMemory.CardPayment
         {
             var errors = await _result.Content.ReadFromJsonAsync<IEnumerable<ErrorResponse>>();
             Assert.AreEqual(1, errors.Count());
-            Assert.AreEqual(expectedErrorMessage, errors.First().ErrorMessage);
+            Assert.AreEqual(expectedErrorMessage, errors.First().Message);
         }
     }
 }

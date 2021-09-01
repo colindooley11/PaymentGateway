@@ -4,11 +4,14 @@
     using System.Net;
     using System.Net.Http;
     using System.Net.Http.Json;
+    using System.Text.Json;
+    using System.Text.Json.Serialization;
     using System.Threading.Tasks;
     using Microsoft.Extensions.DependencyInjection;
     using Models.Data;
     using Models.Web;
     using Moq;
+    using Newtonsoft.Json;
     using NUnit.Framework;
     using Query;
 
@@ -33,6 +36,9 @@
                     ExpiryMonth = 12,
                     ExpiryYear = 25,
                     CardNumber = "444433******1111",
+                    PaymentReference = paymentReference,
+                    Currency = "GBP",
+                    Amount = 25
                 };
 
                 paymentDetailsQuery.Setup(query => query.Execute(It.Is<Guid>(guid => guid == paymentReference)))
@@ -52,11 +58,15 @@
             [Test]
             public async Task Then_The_Payload_Is_Retrieved_From_The_Database()
             {
-                var paymentDetailsResponse = await _result.Content.ReadFromJsonAsync<PaymentDetailsResponse>();
+                var paymentDetailsResponsString = await _result.Content.ReadAsStringAsync();
+                var paymentDetailsResponse = JsonConvert.DeserializeObject<PaymentDetailsResponse>(paymentDetailsResponsString);
                 Assert.AreEqual(_savedPaymentDetails.Status, paymentDetailsResponse.PaymentStatus);
                 Assert.AreEqual(_savedPaymentDetails.CardNumber, paymentDetailsResponse.FirstSixLastFour);
                 Assert.AreEqual(_savedPaymentDetails.ExpiryYear, paymentDetailsResponse.ExpiryYear);
                 Assert.AreEqual(_savedPaymentDetails.ExpiryMonth, paymentDetailsResponse.ExpiryMonth);
+                Assert.AreEqual(_savedPaymentDetails.Currency, paymentDetailsResponse.Currency);
+                Assert.AreEqual(_savedPaymentDetails.PaymentReference, paymentDetailsResponse.PaymentReference);
+                Assert.AreEqual(_savedPaymentDetails.Amount, paymentDetailsResponse.Amount);
             }
         }
 
@@ -64,8 +74,8 @@
         {
             var _client = new InMemoryApiBuilder(collection =>
                 collection.AddSingleton(paymentDetailsQuery.Object)).CreateClient();
-            _client.DefaultRequestHeaders.Add("ApiKey", "letmein");
-            return _client; 
+            _client.DefaultRequestHeaders.Add("ApiKey", "Merchant-1");
+            return _client;
         }
 
         [TestFixture]
@@ -73,7 +83,7 @@
         {
             private HttpClient _client;
             private HttpResponseMessage _result;
-      
+
             [Test]
             public async Task When_Retrieving_Payment_Details_Then_A_404_Not_Found_Is_Returned()
             {

@@ -4,6 +4,7 @@
     using System.Threading.Tasks;
     using InMemory;
     using Models.Web;
+    using Newtonsoft.Json;
     using NUnit.Framework;
     using TestStack.BDDfy;
 
@@ -12,6 +13,7 @@
         SoThat = "I can be paid for selling goods")]
     public class PaymentGatewayApiCapturePaymentTestsOutOfProcess : PaymentGatewayApiCardProcessingTestsBase
     {
+        //[Ignore("Need to ensure API is running locally")]
         [Test]
         public void MakePaymentToGatewayWithValidCardWhichCanBeCaptured()
         {
@@ -34,9 +36,9 @@
 
         private async Task The_Response_Body_Indicates_Success()
         {
-            var paymentGatewayResponse =
-                await _result.Content.ReadFromJsonAsync<PaymentGatewayResponse>();
-            Assert.AreEqual(paymentGatewayResponse.Status, "Successful"); 
+            var paymentGatewayResponseString = await _result.Content.ReadAsStringAsync();
+            var paymentGatewayResponse = JsonConvert.DeserializeObject<PaymentGatewayResponse>(paymentGatewayResponseString);
+            Assert.AreEqual(PaymentStatusEnum.Success, paymentGatewayResponse.Status); 
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿namespace PaymentGateway.Api.BankSimulator
 {
+    using System;
     using System.Net;
     using System.Net.Http;
     using System.Net.Http.Json;
@@ -20,7 +21,7 @@
 
             return new HttpResponseMessage(HttpStatusCode.OK)
             {
-                Content = JsonContent.Create(new AcquiringBankResponse { Status = status })
+                Content = JsonContent.Create(new AcquiringBankResponse { Status = status, BankIdentifier = Guid.NewGuid(), FailureReason = status == PaymentStatusEnum.Failure ? "Not enough funds" : null })
             };
         }
     }

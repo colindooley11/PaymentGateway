@@ -36,7 +36,6 @@ namespace PaymentGateway.Api.IntegrationTests
             };
 
             await saveCardPaymentCommand.Execute(_cardPaymentData);
-
            
         }
 
