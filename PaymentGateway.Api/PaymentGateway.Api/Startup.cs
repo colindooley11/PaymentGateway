@@ -1,11 +1,13 @@
 namespace PaymentGateway.Api
 {
+    using System.Text.Json.Serialization;
     using BankSimulator;
     using Builders;
     using Clients;
     using Commands;
     using Filters;
     using FluentValidation.AspNetCore;
+    using Microsoft.AspNetCore.Authentication;
     using Microsoft.AspNetCore.Builder;
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.Extensions.Configuration;
@@ -31,6 +33,9 @@ namespace PaymentGateway.Api
             ).ConfigureApiBehaviorOptions(options =>
             {
                 options.SuppressModelStateInvalidFilter = true;
+            }).AddJsonOptions(options =>
+            {
+                options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
             });
 
             services.AddSwaggerGen(c =>
@@ -48,6 +53,11 @@ namespace PaymentGateway.Api
 
             services.AddMvc().AddFluentValidation(configuration =>
                 configuration.RegisterValidatorsFromAssemblyContaining<Program>());
+
+            services.AddAuthorization();
+
+           services.AddAuthentication("ApiKey")
+                .AddScheme<AuthenticationSchemeOptions, BasicAuthenticationHandler>("ApiKey", null);
         }
 
         protected virtual void BuildCosmosFactory(IServiceCollection services, string accountEndpoint,
@@ -76,6 +86,7 @@ namespace PaymentGateway.Api
 
             app.UseRouting();
 
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints => { endpoints.MapControllers(); });

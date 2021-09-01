@@ -2,13 +2,14 @@
 {
     using System;
     using System.Threading.Tasks;
-    using Filters;
+    using Mapper;
+    using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Mvc;
     using Query;
 
+    [Authorize]
     [Route("PaymentGateway/[controller]")]
     [ApiController]
-    [ApiKey]
     public class PaymentDetailsController : ControllerBase
     {
         private readonly IGetPaymentDetailsQuery _getPaymentDetailsCosmosQuery;
@@ -28,7 +29,7 @@
                 return new NotFoundResult(); 
             }
 
-            return new OkObjectResult(paymentDetails);
+            return new OkObjectResult(CardPaymentMapper.ToPaymentResponse(paymentDetails));
         }
     }
 }

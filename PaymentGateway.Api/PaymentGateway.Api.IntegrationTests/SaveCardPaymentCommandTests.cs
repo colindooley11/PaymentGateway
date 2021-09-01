@@ -43,7 +43,7 @@ namespace PaymentGateway.Api.IntegrationTests
                 .Where(payment => payment.PaymentReference.ToString() == _paymentReference.ToString());
 
             var card = query.ToList().First();
-            Assert.AreEqual(card.CardNumber, "4444333322221111");
+            Assert.AreEqual(card.CardNumber, "444433******1111");
             Assert.AreEqual(card.Amount, 50);
             Assert.AreEqual(card.Currency, "GBP");
             Assert.AreEqual(card.ExpiryMonth, 1);

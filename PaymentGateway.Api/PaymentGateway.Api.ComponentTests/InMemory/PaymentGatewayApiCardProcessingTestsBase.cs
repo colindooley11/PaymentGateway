@@ -31,11 +31,15 @@ namespace PaymentGateway.Api.ComponentTests.InMemory
             _client = new OutOfProcessApiBuilder().CreateClient();
         }
 
+        public void An_In_Process_Payment_Gateway_Api_Without_Authentication()
+        {
+            An_In_Process_Payment_Gateway_Api(() => new BankSimulatorScenarioBuilder(), true);
+        }
         public void An_In_Process_Payment_Gateway_Api()
         {
-            An_In_Process_Payment_Gateway_Api(() => new BankSimulatorScenarioBuilder());
+            An_In_Process_Payment_Gateway_Api(() => new BankSimulatorScenarioBuilder(), false);
         }
-        public void An_In_Process_Payment_Gateway_Api(Func<BankSimulatorScenarioBuilder> bankSimulatorScenarioBuilder)
+        public void An_In_Process_Payment_Gateway_Api(Func<BankSimulatorScenarioBuilder> bankSimulatorScenarioBuilder, bool withoutAuthentication)
         {
             _cardPaymentCommand = new Mock<ISaveCardPaymentCommand>();
             BankSimulatorScenarioSpy = bankSimulatorScenarioBuilder().Build();
@@ -51,6 +55,10 @@ namespace PaymentGateway.Api.ComponentTests.InMemory
                     });
 
             })).CreateClient();
+            if (!withoutAuthentication)
+            {
+                _client.DefaultRequestHeaders.Add("ApiKey", "letmein");
+            }
         }
 
         protected async Task A_201_Created_Is_Returned()
@@ -75,6 +83,10 @@ namespace PaymentGateway.Api.ComponentTests.InMemory
 
         protected void Valid_Card_Details()
         {
+            if (CardNumber == null)
+            {
+                CardNumber = MagicCards.Success;
+            }
             _card = new CardPaymentRequest
             {
                 CardNumber = CardNumber,
@@ -89,15 +101,11 @@ namespace PaymentGateway.Api.ComponentTests.InMemory
 
         protected async Task Processing_The_Card_Payment()
         {
-            Processing_The_Card_Payment(true);
-        }
-
-        protected async Task Processing_The_Card_Payment(bool withApiKey)
-        {
             var json = JsonConvert.SerializeObject(_card);
+            var content = new StringContent(json, Encoding.UTF8, MediaTypeNames.Application.Json);
             _result = await _client
                  .PostAsync(new Uri("PaymentGateway/CardPayment/ProcessPayment",
-                     UriKind.Relative), new StringContent(json, Encoding.UTF8, MediaTypeNames.Application.Json))
+                     UriKind.Relative), content)
                  .ConfigureAwait(false); ;
         }
 

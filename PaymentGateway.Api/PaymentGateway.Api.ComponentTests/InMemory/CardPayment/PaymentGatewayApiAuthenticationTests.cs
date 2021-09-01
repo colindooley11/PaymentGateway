@@ -1,12 +1,5 @@
 namespace PaymentGateway.Api.ComponentTests.InMemory.CardPayment
 {
-    using System;
-    using System.Collections;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Net.Http.Json;
-    using System.Threading.Tasks;
-    using Models.Web;
     using NUnit.Framework;
     using TestStack.BDDfy;
 
@@ -17,11 +10,11 @@ namespace PaymentGateway.Api.ComponentTests.InMemory.CardPayment
     public class PaymentGatewayApiAuthenticationTests : PaymentGatewayApiCardProcessingTestsBase
     {
         [Test]
-        public void WhenAPaymentRequestIsAnAuthorised()
+        public void WhenAPaymentRequestIsUnAuthorised()
         {
-            this.Given(s => s.An_In_Process_Payment_Gateway_Api())
+            this.Given(s => s.An_In_Process_Payment_Gateway_Api_Without_Authentication())
                 .And(s => s.Valid_Card_Details())
-                .When(s => s.Processing_The_Card_Payment(false))
+                .When(s => s.Processing_The_Card_Payment())
                 .Then(s => s.A_401_UnAuthorised_Is_Returned())
                 .BDDfy();
         }

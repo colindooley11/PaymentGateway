@@ -25,7 +25,7 @@ namespace PaymentGateway.Api.ComponentTests.InMemory.CardPayment
         [Test]
         public void MakePaymentToBrokenAcquiringBank()
         {
-            this.Given(s => s.An_In_Process_Payment_Gateway_Api(() => new BankSimulatorScenarioBuilder().WithFailure()))
+            this.Given(s => s.An_In_Process_Payment_Gateway_Api(() => new BankSimulatorScenarioBuilder().WithFailure(), false))
                 .And(s => s.Valid_Card_Details())
                 .When(s => s.Processing_The_Card_Payment())
                 .Then(s => s.A_500_InternalServer_Error_Is_Returned())

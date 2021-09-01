@@ -13,6 +13,7 @@ namespace PaymentGateway.Api.IntegrationTests
     {
         private Container _container;
         private Guid _paymentReference;
+        private CardPaymentData _cardPaymentData;
 
         [SetUp]
         public async Task SetUp()
@@ -23,28 +24,34 @@ namespace PaymentGateway.Api.IntegrationTests
 
             var saveCardPaymentCommand = new SaveCardPaymentCosmosCommand(_container);
             _paymentReference = Guid.NewGuid();
-            var cardPaymentData = new CardPaymentData
+            _cardPaymentData = new CardPaymentData
             {
                 Id = _paymentReference,
                 PaymentReference = _paymentReference,
-                CardNumber = "4444333322221111",
+                CardNumber = "444433******1111",
                 Amount = 50,
                 Currency = "GBP",
                 ExpiryMonth = 1,
                 ExpiryYear = 22
             };
 
-            await saveCardPaymentCommand.Execute(cardPaymentData);
+            await saveCardPaymentCommand.Execute(_cardPaymentData);
 
-            var getPaymentDetailsQuery  = new GetPaymentDetailsCosmosQuery(_container);
+           
+        }
 
-            var paymentDetailsResponse =  await getPaymentDetailsQuery.Execute(cardPaymentData.PaymentReference);
+        [Test]
+        public async Task Then_The_Card_Details_Are_Retrieved()
+        {
+            var getPaymentDetailsQuery = new GetPaymentDetailsCosmosQuery(_container);
 
-            Assert.AreEqual(cardPaymentData.ExpiryYear, paymentDetailsResponse.ExpiryYear);
-            Assert.AreEqual(cardPaymentData.Amount, paymentDetailsResponse.Amount);
-            Assert.AreEqual("444433******1111", paymentDetailsResponse.FirstSixLastFour);
-            Assert.AreEqual(cardPaymentData.ExpiryMonth, paymentDetailsResponse.ExpiryMonth);
-            Assert.AreEqual(cardPaymentData.Currency, paymentDetailsResponse.Currency);
+            var paymentDetailsResponse = await getPaymentDetailsQuery.Execute(_cardPaymentData.PaymentReference);
+
+            Assert.AreEqual(_cardPaymentData.ExpiryYear, paymentDetailsResponse.ExpiryYear);
+            Assert.AreEqual(_cardPaymentData.Amount, paymentDetailsResponse.Amount);
+            Assert.AreEqual("444433******1111", paymentDetailsResponse.CardNumber);
+            Assert.AreEqual(_cardPaymentData.ExpiryMonth, paymentDetailsResponse.ExpiryMonth);
+            Assert.AreEqual(_cardPaymentData.Currency, paymentDetailsResponse.Currency);
         }
 
         [OneTimeTearDown]

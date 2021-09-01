@@ -4,6 +4,8 @@ using Microsoft.Azure.Cosmos;
 
 namespace PaymentGateway.Api.Query
 {
+    using System.Linq;
+    using Models.Data;
     using Models.Web;
 
     public class GetPaymentDetailsCosmosQuery : IGetPaymentDetailsQuery
@@ -15,9 +17,10 @@ namespace PaymentGateway.Api.Query
             _container = container;
         }
 
-        public Task<PaymentDetailsResponse> Execute(Guid paymentReference)
+        public async Task<CardPaymentData> Execute(Guid paymentReference)
         {
-            throw new NotImplementedException();
+            return this._container
+                .GetItemLinqQueryable<CardPaymentData>(allowSynchronousQueryExecution:true).Where(payment => payment.PaymentReference.ToString() == paymentReference.ToString()).ToList().First();
         }
     }
 }
