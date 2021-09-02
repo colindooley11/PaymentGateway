@@ -1,9 +1,5 @@
 ﻿namespace PaymentGateway.Api.ComponentTests.InMemory.CardPayment
 {
-    using System.Collections.Generic;
-    using System.Net.Http.Json;
-    using System.Text.Json;
-    using System.Text.Json.Serialization;
     using System.Threading.Tasks;
     using Api.BankSimulator;
     using Models.Data;
@@ -43,6 +39,25 @@
                 .BDDfy();
         }
 
+        [Test]
+        public void MakePaymentToGatewayWithValidCardMoreThanOnce()
+        {
+            this.Given(s => s.The_Result_Is_Already_Persisted(ExpectedStatusOutcome))
+                .And(s => s.An_In_Process_Payment_Gateway_Api())
+                .And(s => s.Valid_Card_Details())
+                .When(s => s.Processing_The_Card_Payment())
+                .Then(s => s.A_201_Created_Is_Returned())
+                .Then(s => s.Location_Header_Is_Set())
+                .And(s => s.The_Response_Body_Indicates_The_Status_Of_The_Payment())
+                .And(s => s.The_Response_Is_Not_Persisted())
+                .WithExamples(new ExampleTable("BankSimulatorOutcome", "CardNumber", "ExpectedMaskedCardNumber", "ExpectedStatusOutcome")
+                {
+                    {"Successful Card Capture", MagicCards.Success, MagicCards.SuccessMask, PaymentStatusEnum.Success},
+                    {"Declined Card Capture", MagicCards.Decline, MagicCards.DeclineMask, PaymentStatusEnum.Failure}
+                })
+                .BDDfy();
+        }
+
         private async Task The_Response_Body_Indicates_The_Status_Of_The_Payment()
         {
             var paymentGatewayResponseString = await _result.Content.ReadAsStringAsync();
@@ -54,6 +69,11 @@
         {
             this._cardPaymentCommand.Verify(command => command.Execute(It.Is<CardPaymentData>(data =>
                 AssertCardPaymentDataIsMapped(data))));
+        }
+
+        protected void The_Response_Is_Not_Persisted()
+        {
+            this._cardPaymentCommand.Verify(command => command.Execute(It.IsAny<CardPaymentData>()), Times.Never);
         }
 
         private bool AssertCardPaymentDataIsMapped(CardPaymentData data)

@@ -63,7 +63,6 @@ namespace PaymentGateway.Api
                  .AddScheme<AuthenticationSchemeOptions, ApiKeyAuthenticationHandler>("ApiKey", null);
 
             ConfigureSwagger(services);
-
         }
 
         private static void ConfigureSwagger(IServiceCollection services)
@@ -122,9 +121,11 @@ namespace PaymentGateway.Api
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
-                app.UseSwagger();
-                app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "PaymentGateway.Api v1"));
             }
+
+            app.UseSwagger();
+            app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "PaymentGateway.Api v1"));
+
 
             app.UseHttpsRedirection();
            

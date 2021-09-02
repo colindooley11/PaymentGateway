@@ -5,6 +5,7 @@ namespace PaymentGateway.Api.Models.Web
     /// <summary>
     /// Request used to place a card payment
     /// </summary>
+    /// <remarks>Please use 4444333322221111  </remarks>
     public class CardPaymentRequest
     {
         /// <summary>

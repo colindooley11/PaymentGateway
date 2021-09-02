@@ -16,6 +16,8 @@ namespace PaymentGateway.Api.ComponentTests.InMemory
     using Newtonsoft.Json;
     using NUnit.Framework;
     using OutOfProcess;
+    using PaymentGateway.Api.Models.Data;
+    using PaymentGateway.Api.Query;
 
     public class PaymentGatewayApiCardProcessingTestsBase
     {
@@ -25,6 +27,7 @@ namespace PaymentGateway.Api.ComponentTests.InMemory
         protected Mock<ISaveCardPaymentCommand> _cardPaymentCommand;
         protected BankSimulatorDelegatingHandlerSpy BankSimulatorScenarioSpy;
         protected string CardNumber;
+        private Mock<IGetPaymentDetailsQuery> _getPaymentDetails = new Mock<IGetPaymentDetailsQuery>();
 
         public void An_Out_Of_Process_Payment_Gateway_Api()
         {
@@ -40,6 +43,7 @@ namespace PaymentGateway.Api.ComponentTests.InMemory
         {
             An_In_Process_Payment_Gateway_Api(() => new BankSimulatorScenarioBuilder(), true);
         }
+
         public void An_In_Process_Payment_Gateway_Api(Func<BankSimulatorScenarioBuilder> bankSimulatorScenarioBuilder, bool withAuthentication)
         {
             _cardPaymentCommand = new Mock<ISaveCardPaymentCommand>();
@@ -48,6 +52,7 @@ namespace PaymentGateway.Api.ComponentTests.InMemory
             _client = new InMemoryApiBuilder((collection =>
             {
                 collection.AddSingleton(_cardPaymentCommand.Object);
+                collection.AddSingleton(_getPaymentDetails.Object);
                 collection.AddHttpClient<AcquiringBankClient>()
                     .ConfigureHttpMessageHandlerBuilder(builder =>
                     {
@@ -65,6 +70,22 @@ namespace PaymentGateway.Api.ComponentTests.InMemory
             {
                 _client.DefaultRequestHeaders.Clear();
             }
+        }
+
+        protected void The_Result_Is_Already_Persisted(PaymentStatusEnum status)
+        {
+            _getPaymentDetails = new Mock<IGetPaymentDetailsQuery>();
+            _getPaymentDetails.Setup(query => query.Execute(It.IsAny<Guid>()))
+                .ReturnsAsync(() => new CardPaymentData
+                {
+                    Amount = 50,
+                    CardNumber = "4444333322221111",
+                    Currency = "GBP",
+                    ExpiryMonth = 1,
+                    ExpiryYear = 25,
+                    PaymentReference = Guid.NewGuid(),
+                    Status = status
+                });
         }
 
         protected async Task A_201_Created_Is_Returned()

@@ -25,6 +25,7 @@
         [Route("{paymentReference:guid}")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(PaymentDetailsResponse))]
         [ProducesResponseType(typeof(object), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(object), StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> RetrievePaymentDetails(Guid paymentReference)
         {
             var paymentDetails = await _getPaymentDetailsCosmosQuery.Execute(paymentReference);

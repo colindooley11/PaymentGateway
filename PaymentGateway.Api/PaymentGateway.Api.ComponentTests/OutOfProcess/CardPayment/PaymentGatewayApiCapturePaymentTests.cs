@@ -12,8 +12,8 @@
         SoThat = "I can be paid for selling goods")]
     public class PaymentGatewayApiCapturePaymentTestsOutOfProcess : PaymentGatewayApiCardProcessingTestsBase
     {
-        [Ignore("Need to ensure API is running locally")]
         [Test]
+        [Ignore("The deployment kills the app unless it is published and causes this to fail")]
         public void MakePaymentToGatewayWithValidCardWhichCanBeCaptured()
         {
             this.Given(s => s.An_Out_Of_Process_Payment_Gateway_Api())
