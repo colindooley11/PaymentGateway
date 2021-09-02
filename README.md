@@ -6,7 +6,7 @@ The Payment Gateway meets the requirements (albeit simply) for:
 2. Get Payment Details
 3. Allow simulation of bank 
 
-I have added a few extras too ;) - also in this readme I discuss some of the points I missed in the archictecture part of interview with my terribly straw man discussion of an architecture. 
+I have added a few extras too ;) - also in this readme I discuss some of the points I missed in the architecture part of interview with my terribly straw man discussion of an architecture. 
 I absolutely know a bunch of approaches to provide security, scalability, uptime, resiliency etc and was frustrated I never explained them! 
 
 ### Extras
@@ -21,7 +21,7 @@ I absolutely know a bunch of approaches to provide security, scalability, uptime
 
 ### Would like to haves
  - Health check Action (i.e. route)  for Load Balancing, Health Checks for runtime deployment (.Net core allows liveness and readiness checks) 
- - Use of an orchastrator like Kubernetes to demo scaling 
+ - Use of an orchestrator like Kubernetes,  to demo scaling 
  - Use of KeyVault (Secret management), and  UserSecrets (i.e. NET core user secret files) , Environment variables 
  - Containerisation (I started but then backed out not knowing if I would be able to get you guys running without scripts) 
  - Cosmos DB change feed and/ or Azure Service Bus integration to persist payment details in a materialized view/projection in a separate read store this is why I went with Cosmos as opposed to EF in memory as I was going to use containers and pull the Emulator container but it was 5GB in size
@@ -67,6 +67,7 @@ There are a number of tests
 1. In and out of process "component tests"  - (Aligned with https://martinfowler.com/articles/microservice-testing/ (which we pretty much as a go to at ASOS)  *WebApplicationFactory* and - previously - TestServer alone allows us to get the API up in memory and allows us to start the TDD cycle by starting out adding test for missing routes (i.e the Actions on the controllers)  :) 
 
 I always attempt to test sociably as opposed to in a solitary way.  The unit - here - is the API and I observe the input, outputs and colloborators on the API using spys, stubs and mocks.  Although both solitary and sociable testing are perfectly fine and can be used interchangably, at ASOS we have definitely favoured more sociable testing and testing as much behaviour as possible pushing out - right to the edges-  and stubbing the external calls only
+
 2.  Integration tests - these test the Cosmos DB commands and queries used for the peristence and retrieval of payment data.  I note in one of the OutOfProcess tests that we could ditch these integration tests and use a "honeycomb" style approach and simply have the database called
 
 If you CD into 
@@ -75,7 +76,7 @@ If you CD into
 
 and run 
 
- dotnet test .\PaymentGatewayTest.sln
+ `dotnet test .\PaymentGatewayTest.sln`
 
 
 ## Structure
