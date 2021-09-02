@@ -12,6 +12,7 @@ I absolutely know a bunch of approaches to provide security, scalability, uptime
 ### Extras
  - CI Pipeline, GitHub Action to build, test and publish app (albeit mostly code-genned) 
  - Published API to Azure App
+ - Idempotency (not header based - based on PaymentReference)
  - Extra swagger documentation (XML and fluent based)  (including some example data) 
  - External calls to Cosmos Database
  - Application insights logging (its configured and implicitly logging dependencies, requests and exceptions) 
@@ -19,7 +20,6 @@ I absolutely know a bunch of approaches to provide security, scalability, uptime
  - Api Key Authentication *The APIKey is sent as the ApiKey header with the value "Merchant-1"* (this can be done easily in Swagger UI)
 
 ### Would like to haves
- - I haven't implemented idempotency so **please** use a new PaymentReference each time you make a Card Payment request (the PayRef was going to be my idempotency key but have run out of time) 
  - Health check Action (i.e. route)  for Load Balancing, Health Checks for runtime deployment (.Net core allows liveness and readiness checks) 
  - Use of an orchastrator like Kubernetes to demo scaling 
  - Use of KeyVault (Secret management), and  UserSecrets (i.e. NET core user secret files) , Environment variables 
@@ -38,13 +38,11 @@ The bank simulator supports 2  sets of cards:
 - *4444333322221111* - Provides success
 - *Any other valid card number* - Provides decline 
 
-Please use a new payment reference each time, otherwise you will get  (in effect) a   PK conflict - basically I should've used another key to persist on separate to the payment reference identifier - unless I was going to implement idempotency (which I thought Id get around to) 
-
 ## Running the application locally
 ### Pre-Requisites
 
 The application uses .NET 5 so please ensure you have the latest SDK https://dotnet.microsoft.com/download/dotnet/5.0
-I was *going* to use containers but I have no great working knowledge here,  but I appreciate this would open up other options (nice to haves discussed later) 
+I was *going* to use containers but I have not got a great working knowledge here,  but I appreciate this would open up other options (nice to haves discussed later) 
 
 Once you have cloned the repo (or downloaded a package) the absolute easiest way is to 'F5' in Visual Studio,
 this is easier as the Swagger UI is also loaded, however,  if this is not possible, then please do the following: 
@@ -116,9 +114,8 @@ When considering the HttpStatus codes for the responses I had a peek at your API
 Lastly, most of this code has usings and constructors (unlike the code snippet I didn't spot it on) :)
 
 ## Known issues
-I know that I have left the localhost "host" in the Location URI returned on the 201 Created for a Card Payment this should be swapped out per environment
-I mentioned it above, but if you use the same PaymentReference you will receive a 500 internal server error (which is a 409 conflict at Cosmos) 
-so please use a new PaymentReference for each request - I can fix this by either providing idempotency on this key or persisting on a different key, with the upshot that - without idempotency- there may be multiple captures if the API was retried 
+I have hardcode the azure "host" in the Location URI returned on the 201 Created for a Card Payment this should be swapped out per environment
+
 
 
 ### THANKS
